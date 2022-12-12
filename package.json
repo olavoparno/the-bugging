@@ -1,10 +1,11 @@
 {
   "name": "the-bugging",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc src/index.ts --outDir dist"
+    "build": "tsc src/index.ts --outDir dist",
+    "release": "standard-version"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0",
+    "standard-version": "^9.5.0",
     "typescript": "*"
   }
 }
