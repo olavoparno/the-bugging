@@ -5,7 +5,7 @@ export class TheBugging {
   private preExistingOnError: OnErrorEventHandler = null;
   private preExistingOnUnhandledRejection: OnUnhandledRejection = null;
   private config: Config;
-  private errorStackParser(
+  private onErrorParser(
     event: Event | string,
     source?: string,
     lineno?: number,
@@ -19,6 +19,27 @@ export class TheBugging {
     };
 
     return errorObj;
+  }
+  private onUnhandledRejectionParser(error: Error) {
+    const { message, stack } = error;
+
+    if (stack) {
+      const [errorFile, errorLine, errorColumn] = stack
+        .split("\n")[1]
+        .replace("at ", "")
+        .split(":");
+
+      const errorObj = {
+        message: message || "",
+        errorFile: errorFile.trimStart(),
+        errorLine: +errorLine.replace(/\D/g, ""),
+        errorColumn: +errorColumn.replace(/\D/g, ""),
+      };
+
+      return errorObj;
+    }
+
+    return null;
   }
   private logError(error?: Error) {
     if (this.config.logErrors && error) {
@@ -56,7 +77,7 @@ export class TheBugging {
     return window.onunhandledrejection;
   }
 
-  private sendToServer(errorObject: ErrorObject) {
+  private sendToServer(errorObject: ErrorObject | null) {
     const { clientKey } = this.config;
 
     const url = `${apiUrl}/error?clientKey=${clientKey}`;
@@ -66,7 +87,6 @@ export class TheBugging {
       headers: {
         "Content-Type": "application/json",
       },
-      mode: "no-cors",
       body: JSON.stringify({ error: errorObject }),
     }).catch((error) => {
       console.error("Error while posting to server:", error);
@@ -90,7 +110,7 @@ export class TheBugging {
 
       this.logError(error);
 
-      const errorObject = this.errorStackParser(event, source, lineno, colno);
+      const errorObject = this.onErrorParser(event, source, lineno, colno);
 
       this.sendToServer(errorObject);
       console.log("errorObject", errorObject);
@@ -103,7 +123,11 @@ export class TheBugging {
 
       this.logError(event.reason);
 
-      const errorObject = this.errorStackParser(event.reason.stack);
+      console.log("event", event);
+      console.log("event.reason", event.reason);
+      console.log("event.reason.stack", event.reason.stack);
+
+      const errorObject = this.onUnhandledRejectionParser(event.reason);
 
       this.sendToServer(errorObject);
       console.log("errorObject", errorObject);
@@ -133,7 +157,3 @@ export class TheBugging {
 }
 
 export default TheBugging;
-
-// const sasa = TheBugging.init({ clientKey: "123", logErrors: false });
-
-// sasa.main();
