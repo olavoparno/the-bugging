@@ -89,7 +89,7 @@ export class TheBugging {
       },
       body: JSON.stringify({ error: errorObject }),
     }).catch((error) => {
-      console.error("Error while posting to server:", error);
+      this.logError(error);
     });
   }
 
@@ -113,7 +113,6 @@ export class TheBugging {
       const errorObject = this.onErrorParser(event, source, lineno, colno);
 
       this.sendToServer(errorObject);
-      console.log("errorObject", errorObject);
     };
 
     window.onunhandledrejection = (event) => {
@@ -123,14 +122,9 @@ export class TheBugging {
 
       this.logError(event.reason);
 
-      console.log("event", event);
-      console.log("event.reason", event.reason);
-      console.log("event.reason.stack", event.reason.stack);
-
       const errorObject = this.onUnhandledRejectionParser(event.reason);
 
       this.sendToServer(errorObject);
-      console.log("errorObject", errorObject);
     };
   }
 
