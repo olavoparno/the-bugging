@@ -24,20 +24,32 @@ export class TheBugging {
     return errorObj;
   }
 
+  private static betweenMarkers(text: string, begin: string, end: string) {
+    const firstChar = text.indexOf(begin) + begin.length;
+    const lastChar = text.indexOf(end);
+    return text.substring(firstChar, lastChar);
+  }
+
   private static onUnhandledRejectionParser(error: Error) {
     const { message, stack } = error;
 
     if (stack) {
-      const [errorFile, errorLine, errorColumn] = stack
-        .split("\n")[1]
-        .replace("at ", "")
-        .split(":");
+      const errorFile = TheBugging.betweenMarkers(
+        stack.split("\n")[1],
+        "(",
+        ")"
+      );
+
+      const [errorLine, errorColumn] = errorFile
+        .replace(/^https?:\/\//, "")
+        .split(":")
+        .slice(1);
 
       const errorObj = {
         message: message || "",
-        errorFile: errorFile.trimStart(),
-        errorLine: +errorLine.replace(/\D/g, ""),
-        errorColumn: +errorColumn.replace(/\D/g, ""),
+        errorFile: errorFile,
+        errorLine: +errorLine,
+        errorColumn: +errorColumn,
       };
 
       return errorObj;
