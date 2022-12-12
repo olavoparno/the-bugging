@@ -24,30 +24,33 @@ export class TheBugging {
     return errorObj;
   }
 
-  private static betweenMarkers(text: string, begin: string, end: string) {
-    const firstChar = text.indexOf(begin) + begin.length;
-    const lastChar = text.indexOf(end);
-    return text.substring(firstChar, lastChar);
-  }
-
   private static onUnhandledRejectionParser(error: Error) {
-    const { message, stack } = error;
+    const { message = "", stack } = error;
 
     if (stack) {
-      const errorFile = TheBugging.betweenMarkers(
-        stack.split("\n")[1],
-        "(",
-        ")"
-      );
+      const betweenMarkers = (text: string, begin: string, end: string) => {
+        const firstChar = text.indexOf(begin) + begin.length;
+        const lastChar = text.indexOf(end);
+        return text.substring(firstChar, lastChar);
+      };
+      const removeLineAndColumnFromFile = (text: string) => {
+        const rawText = text.replace(/^https?:\/\//, "");
+        const firstChar = rawText.indexOf(":");
+        const diffLengthWithoutProtocol = text.length - rawText.length;
+        return text.substring(0, firstChar + diffLengthWithoutProtocol);
+      };
+      const rawErrorFile = betweenMarkers(stack.split("\n")[1], "(", ")");
 
-      const [errorLine, errorColumn] = errorFile
+      const [errorLine, errorColumn] = rawErrorFile
         .replace(/^https?:\/\//, "")
         .split(":")
         .slice(1);
 
+      const errorFile = removeLineAndColumnFromFile(rawErrorFile);
+
       const errorObj = {
-        message: message || "",
-        errorFile: errorFile,
+        message,
+        errorFile,
         errorLine: +errorLine,
         errorColumn: +errorColumn,
       };
