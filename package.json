@@ -1,23 +1,51 @@
 {
-  "name": "the-bugging",
+  "name": "the-bugging-test",
   "version": "1.0.1",
   "description": "",
+  "keywords": [],
+  "author": "Olavo Parno",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/olavoparno/the-bugging.git"
+  },
   "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "jsnext:main": "dist/index.es.js",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist"
+  ],
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix src/**/*.ts"
+    ]
+  },
   "scripts": {
-    "build": "tsc src/index.ts --outDir dist",
+    "prebuild": "rm -rf dist",
+    "build": "rollup -c && tsc -d --emitDeclarationOnly --noEmit false --declarationDir dist",
+    "lint": "eslint src --fix --cache",
     "release": "standard-version"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "eslint": "^8.0.1",
-    "eslint-config-standard-with-typescript": "^23.0.0",
-    "eslint-plugin-import": "^2.25.2",
-    "eslint-plugin-n": "^15.0.0",
-    "eslint-plugin-promise": "^6.0.0",
+    "@babel/core": "^7.17.4",
+    "@babel/runtime": "^7.17.2",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.1.3",
+    "@rollup/plugin-typescript": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^5.46.0",
+    "@typescript-eslint/parser": "^5.46.0",
+    "eslint": "^8.29.0",
+    "eslint-config-prettier": "8.5.0",
+    "prettier": "2.8.1",
+    "rollup": "^2.67.2",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-terser": "^7.0.2",
     "standard-version": "^9.5.0",
+    "tslib": "^2.3.1",
     "typescript": "*"
   }
 }

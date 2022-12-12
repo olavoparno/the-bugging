@@ -1,14 +1,14 @@
-export type Config = {
+export interface Config {
   clientKey: string;
-  logErrors: boolean;
-};
+  logErrors?: boolean;
+}
 
-export type ErrorObject = {
+export interface ErrorObject {
   message: Event | string;
   errorFile?: string;
   errorLine?: number;
   errorColumn?: number;
-};
+}
 
 export type ErrorStackParser = (
   event: Event | string,
@@ -19,5 +19,5 @@ export type ErrorStackParser = (
 ) => ErrorObject;
 
 export type OnUnhandledRejection =
-  | ((this: WindowEventHandlers, ev: PromiseRejectionEvent) => any)
+  | ((this: WindowEventHandlers, ev: PromiseRejectionEvent) => unknown)
   | null;
