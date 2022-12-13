@@ -12,13 +12,15 @@ export class TheBugging {
     event: Event | string,
     source?: string,
     lineno?: number,
-    colno?: number
+    colno?: number,
+    stack?: string
   ): ErrorObject {
     const errorObj = {
       message: event,
       errorFile: source,
       errorLine: lineno,
       errorColumn: colno,
+      errorStack: stack,
     };
 
     return errorObj;
@@ -34,7 +36,10 @@ export class TheBugging {
         return text.substring(firstChar, lastChar);
       };
       const removeLineAndColumnFromFile = (text: string) => {
-        const rawText = text.replace(/^https?:\/\//, "");
+        const rawText = text
+          .replace(/^https?:\/\//, "")
+          .replace(/^file:\/\//, "")
+          .replace(/^webpack-internal:\/\//, "");
         const firstChar = rawText.indexOf(":");
         const diffLengthWithoutProtocol = text.length - rawText.length;
         return text.substring(0, firstChar + diffLengthWithoutProtocol);
@@ -43,6 +48,8 @@ export class TheBugging {
 
       const [errorLine, errorColumn] = rawErrorFile
         .replace(/^https?:\/\//, "")
+        .replace(/^file:\/\//, "")
+        .replace(/^webpack-internal:\/\//, "")
         .split(":")
         .slice(1);
 
@@ -53,6 +60,7 @@ export class TheBugging {
         errorFile,
         errorLine: +errorLine,
         errorColumn: +errorColumn,
+        errorStack: stack,
       };
 
       return errorObj;
@@ -137,7 +145,8 @@ export class TheBugging {
         event,
         source,
         lineno,
-        colno
+        colno,
+        error?.stack
       );
 
       TheBugging.sendToServer(errorObject);

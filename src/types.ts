@@ -8,15 +8,8 @@ export interface ErrorObject {
   errorFile?: string;
   errorLine?: number;
   errorColumn?: number;
+  errorStack?: string;
 }
-
-export type ErrorStackParser = (
-  event: Event | string,
-  source?: string,
-  lineno?: number,
-  colno?: number,
-  error?: Error
-) => ErrorObject;
 
 export type OnUnhandledRejection =
   | ((this: WindowEventHandlers, ev: PromiseRejectionEvent) => unknown)
