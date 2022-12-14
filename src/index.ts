@@ -21,44 +21,6 @@ export class TheBugging {
     window.onunhandledrejection = this.preExistingOnUnhandledRejection || null;
   }
 
-  private appendEvents() {
-    this.preExistingOnError = this.onErrorExists();
-    this.preExistingOnUnhandledRejection =
-      TheBugging.onUnhandledRejectionExists();
-
-    window.onerror = (event, source, lineno, colno, error) => {
-      if (this.preExistingOnError != null) {
-        this.preExistingOnError.apply(window, [
-          event,
-          source,
-          lineno,
-          colno,
-          error,
-        ]);
-      }
-
-      const errorObject = this.onErrorParser(
-        event,
-        source,
-        lineno,
-        colno,
-        error?.stack
-      );
-
-      this.sendToServer(errorObject);
-    };
-
-    window.onunhandledrejection = (event) => {
-      if (this.preExistingOnUnhandledRejection != null) {
-        this.preExistingOnUnhandledRejection.apply(window, [event]);
-      }
-
-      const errorObject = this.onUnhandledRejectionParser(event.reason);
-
-      this.sendToServer(errorObject);
-    };
-  }
-
   private onErrorParser(
     event: Event | string,
     source?: string,
@@ -120,6 +82,52 @@ export class TheBugging {
     return null;
   }
 
+  private appendEvents() {
+    this.preExistingOnError = this.onErrorExists();
+    this.preExistingOnUnhandledRejection = this.onUnhandledRejectionExists();
+
+    const onErrorHandlerTB: OnErrorEventHandler = (
+      event,
+      source,
+      lineno,
+      colno,
+      error
+    ) => {
+      if (this.preExistingOnError != null) {
+        this.preExistingOnError.apply(window, [
+          event,
+          source,
+          lineno,
+          colno,
+          error,
+        ]);
+      }
+
+      const errorObject = this.onErrorParser(
+        event,
+        source,
+        lineno,
+        colno,
+        error?.stack
+      );
+
+      this.sendToServer(errorObject);
+    };
+
+    const onUnhandledRejectionHandlerTB: OnUnhandledRejection = (event) => {
+      if (this.preExistingOnUnhandledRejection != null) {
+        this.preExistingOnUnhandledRejection.apply(window, [event]);
+      }
+
+      const errorObject = this.onUnhandledRejectionParser(event.reason);
+
+      this.sendToServer(errorObject);
+    };
+
+    window.onerror = onErrorHandlerTB;
+    window.onunhandledrejection = onUnhandledRejectionHandlerTB;
+  }
+
   private checkConfig(config: Config) {
     if (!config.clientKey) {
       throw new Error("clientKey is required");
@@ -132,7 +140,7 @@ export class TheBugging {
     return window.onerror;
   }
 
-  private static onUnhandledRejectionExists() {
+  private onUnhandledRejectionExists() {
     return window.onunhandledrejection;
   }
 
