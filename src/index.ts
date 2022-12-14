@@ -2,13 +2,64 @@ import { apiUrl } from "./constants";
 import { Config, ErrorObject, OnUnhandledRejection } from "./types";
 
 export class TheBugging {
+  private constructor(config: Config) {
+    this.checkConfig(config);
+
+    TheBugging.config = config;
+  }
+
+  private static config: Config;
+
+  private static instance: TheBugging;
+
   private preExistingOnError: OnErrorEventHandler = null;
 
   private preExistingOnUnhandledRejection: OnUnhandledRejection = null;
 
-  private static config: Config;
+  private unAppendEvents() {
+    window.onerror = this.preExistingOnError || null;
+    window.onunhandledrejection = this.preExistingOnUnhandledRejection || null;
+  }
 
-  private static onErrorParser(
+  private appendEvents() {
+    this.preExistingOnError = this.onErrorExists();
+    this.preExistingOnUnhandledRejection =
+      TheBugging.onUnhandledRejectionExists();
+
+    window.onerror = (event, source, lineno, colno, error) => {
+      if (this.preExistingOnError != null) {
+        this.preExistingOnError.apply(window, [
+          event,
+          source,
+          lineno,
+          colno,
+          error,
+        ]);
+      }
+
+      const errorObject = this.onErrorParser(
+        event,
+        source,
+        lineno,
+        colno,
+        error?.stack
+      );
+
+      this.sendToServer(errorObject);
+    };
+
+    window.onunhandledrejection = (event) => {
+      if (this.preExistingOnUnhandledRejection != null) {
+        this.preExistingOnUnhandledRejection.apply(window, [event]);
+      }
+
+      const errorObject = this.onUnhandledRejectionParser(event.reason);
+
+      this.sendToServer(errorObject);
+    };
+  }
+
+  private onErrorParser(
     event: Event | string,
     source?: string,
     lineno?: number,
@@ -26,7 +77,7 @@ export class TheBugging {
     return errorObj;
   }
 
-  private static onUnhandledRejectionParser(error: Error) {
+  private onUnhandledRejectionParser(error: Error) {
     const { message = "", stack } = error;
 
     if (stack) {
@@ -69,13 +120,7 @@ export class TheBugging {
     return null;
   }
 
-  private static logError(error?: Error) {
-    if (TheBugging.config.logErrors && error != null) {
-      console.error(error);
-    }
-  }
-
-  private static checkConfig(config: Config) {
+  private checkConfig(config: Config) {
     if (!config.clientKey) {
       throw new Error("clientKey is required");
     }
@@ -83,7 +128,7 @@ export class TheBugging {
     return null;
   }
 
-  private static onErrorExists() {
+  private onErrorExists() {
     return window.onerror;
   }
 
@@ -91,7 +136,7 @@ export class TheBugging {
     return window.onunhandledrejection;
   }
 
-  private static sendToServer(errorObject: ErrorObject | null) {
+  private sendToServer(errorObject: ErrorObject | null) {
     const { clientKey } = TheBugging.config;
 
     const url = `${apiUrl}/error?clientKey=${clientKey}`;
@@ -102,88 +147,30 @@ export class TheBugging {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ error: errorObject }),
-    }).catch((error) => {
-      TheBugging.logError(error);
     });
   }
 
-  constructor(config: Config) {
-    TheBugging.checkConfig(config);
-
-    TheBugging.config = config;
+  private listenForWindowUnload() {
+    window.onbeforeunload = () => {
+      this.unAppendEvents();
+    };
   }
 
-  static init(config: Config) {
+  private start() {
+    if (typeof window === "undefined") return null;
+
+    this.appendEvents();
+    this.listenForWindowUnload();
+
+    return null;
+  }
+
+  public static init(config: Config) {
     if (!this.instance) {
       this.instance = new TheBugging(config);
     }
 
-    return this.instance;
-  }
-
-  private static instance: TheBugging;
-
-  private appendEvents() {
-    this.preExistingOnError = TheBugging.onErrorExists();
-    this.preExistingOnUnhandledRejection =
-      TheBugging.onUnhandledRejectionExists();
-
-    window.onerror = (event, source, lineno, colno, error) => {
-      if (this.preExistingOnError != null) {
-        this.preExistingOnError.apply(window, [
-          event,
-          source,
-          lineno,
-          colno,
-          error,
-        ]);
-      }
-
-      TheBugging.logError(error);
-
-      const errorObject = TheBugging.onErrorParser(
-        event,
-        source,
-        lineno,
-        colno,
-        error?.stack
-      );
-
-      TheBugging.sendToServer(errorObject);
-    };
-
-    window.onunhandledrejection = (event) => {
-      if (this.preExistingOnUnhandledRejection != null) {
-        this.preExistingOnUnhandledRejection.apply(window, [event]);
-      }
-
-      TheBugging.logError(event.reason);
-
-      const errorObject = TheBugging.onUnhandledRejectionParser(event.reason);
-
-      TheBugging.sendToServer(errorObject);
-    };
-  }
-
-  private unAppendEvents() {
-    window.onerror = this.preExistingOnError || null;
-    window.onunhandledrejection = this.preExistingOnUnhandledRejection || null;
-  }
-
-  public main() {
-    if (typeof window === "undefined") return null;
-
-    this.appendEvents();
-
-    return null;
-  }
-
-  public destroy() {
-    if (typeof window === "undefined") return null;
-
-    this.unAppendEvents();
-
-    return null;
+    this.instance.start();
   }
 }
 

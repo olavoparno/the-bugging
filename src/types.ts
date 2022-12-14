@@ -1,6 +1,5 @@
 export interface Config {
   clientKey: string;
-  logErrors?: boolean;
 }
 
 export interface ErrorObject {
