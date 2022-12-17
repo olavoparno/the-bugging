@@ -149,13 +149,17 @@ export class TheBugging {
 
     const url = `${apiUrl}/error?projectKey=${projectKey}`;
 
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ error: errorObject }),
-    });
+    try {
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ error: errorObject }),
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   private listenForWindowUnload() {
