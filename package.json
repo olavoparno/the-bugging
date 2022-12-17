@@ -27,6 +27,7 @@
     "prebuild": "rm -rf dist",
     "build": "yarn prebuild && rollup -c && tsc -d --emitDeclarationOnly --noEmit false --declarationDir dist",
     "lint": "eslint src --fix --cache",
+    "prepublish": "yarn build",
     "release": "standard-version"
   },
   "devDependencies": {
