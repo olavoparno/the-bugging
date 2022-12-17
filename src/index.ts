@@ -157,8 +157,10 @@ export class TheBugging {
         },
         body: JSON.stringify({ error: errorObject }),
       });
-    } catch (error) {
-      console.error(error);
+    } catch {
+      this.unAppendEvents();
+    } finally {
+      this.start();
     }
   }
 
