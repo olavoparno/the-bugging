@@ -129,8 +129,8 @@ export class TheBugging {
   }
 
   private checkConfig(config: Config) {
-    if (!config.clientKey) {
-      throw new Error("clientKey is required");
+    if (!config.projectKey) {
+      throw new Error("projectKey is required");
     }
 
     return null;
@@ -145,9 +145,9 @@ export class TheBugging {
   }
 
   private sendToServer(errorObject: ErrorObject | null) {
-    const { clientKey } = TheBugging.config;
+    const { projectKey } = TheBugging.config;
 
-    const url = `${apiUrl}/error?clientKey=${clientKey}`;
+    const url = `${apiUrl}/error?projectKey=${projectKey}`;
 
     fetch(url, {
       method: "POST",

@@ -1,5 +1,5 @@
 export interface Config {
-  clientKey: string;
+  projectKey: string;
 }
 
 export interface ErrorObject {
