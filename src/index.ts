@@ -155,13 +155,11 @@ export class TheBugging {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ error: errorObject }),
-    })
-      .catch(() => {
-        return this.unAppendEvents();
-      })
-      .finally(() => {
-        return this.start();
-      });
+    }).catch(() => {
+      this.unAppendEvents();
+
+      return this.start();
+    });
   }
 
   private listenForWindowUnload() {
@@ -182,9 +180,10 @@ export class TheBugging {
   public static init(config: Config) {
     if (!this.instance) {
       this.instance = new TheBugging(config);
+      this.instance.start();
     }
 
-    this.instance.start();
+    return null;
   }
 }
 
