@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.14](https://github.com/olavoparno/the-bugging/compare/v1.0.13...v1.0.14) (2022-12-22)
+
 ### [1.0.13](https://github.com/olavoparno/the-bugging/compare/v1.0.12...v1.0.13) (2022-12-17)
 
 ### [1.0.12](https://github.com/olavoparno/the-bugging/compare/v1.0.11...v1.0.12) (2022-12-17)
