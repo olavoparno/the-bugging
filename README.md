@@ -15,12 +15,24 @@
 
 - Grab your _projectKey_ at [www.thebugging.com](https://www.thebugging.com).
 
-> P.S.: This is only for web projects as it heavyly depends on the window.
-> P.S.2: It is SSR ready for projects using Next.js.
+> P.S.: This is only for web projects as it heavyly depends on the DOM window.
+> P.S.2: It is SSR ready for projects using Next.js but still only meant to be run on the client.
 
 ---
 
 ## Installation
+
+- First, add the dependency to your project
+
+```bash
+  npm install the-bugging
+```
+
+- Or alternatively, with yarn:
+
+```bash
+  yarn add the-bugging
+```
 
 - With a valid _projectKey_, simply start at the very top of your web project like so:
 
