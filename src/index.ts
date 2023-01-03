@@ -148,10 +148,12 @@ export class TheBugging {
     const { projectKey } = TheBugging.config;
 
     const url = `${apiUrl}/error?projectKey=${projectKey}`;
+    const originUrl = window.location.origin;
 
     fetch(url, {
       method: "POST",
       headers: {
+        Origin: originUrl,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ error: errorObject }),

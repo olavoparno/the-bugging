@@ -1,1 +1,1 @@
-export const apiUrl = "https://the-bugging-server.vercel.app/api";
+export const apiUrl = "https://www.thebugging.com/api";
