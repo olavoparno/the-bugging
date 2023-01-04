@@ -153,7 +153,7 @@ export class TheBugging {
     fetch(url, {
       method: "POST",
       headers: {
-        Origin: originUrl,
+        "X-Api-Origin": originUrl,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ error: errorObject }),
