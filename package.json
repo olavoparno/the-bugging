@@ -1,6 +1,6 @@
 {
   "name": "the-bugging",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "TheBugging is a simple and lightweight library for logging and debugging your code.",
   "keywords": [],
   "author": "Olavo Parno",
@@ -27,7 +27,7 @@
     "prebuild": "rm -rf dist",
     "build": "yarn prebuild && rollup -c && tsc -d --emitDeclarationOnly --noEmit false --declarationDir dist",
     "lint": "eslint src --fix --cache",
-    "prepublish": "yarn build",
+    "prepublishOnly": "yarn build",
     "contributors:add": "all-contributors add",
     "contributors:generate": "all-contributors generate",
     "release": "standard-version"
